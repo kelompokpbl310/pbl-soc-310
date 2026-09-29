@@ -1,0 +1,56 @@
+networks:
+  dmz-net:
+    driver: bridge
+  int-net:
+    driver: bridge
+  soc-net:
+    driver: bridge
+
+services:
+  waf:
+    image: owasp/modsecurity-crs:nginx
+    container_name: waf-dmz
+    ports:
+      - "8080:8080"
+    environment:
+      - BACKEND=http://web:5000
+      - PORT=8080
+    networks:
+      - dmz-net
+      - int-net
+    depends_on:
+      - web
+
+  web:
+    build: ../backend
+    container_name: web-flask
+    expose:
+      - "5000"
+    networks:
+      - int-net
+    environment:
+      - DB_HOST=db
+      - DB_USER=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+      - DB_NAME=${MYSQL_DATABASE}
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    networks:
+      - int-net
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
