@@ -25,3 +25,14 @@ User -> Internet -> OPNsense -> Nginx DMZ (WAF + LB) -> Web Flask -> MySQL
 ## Penyimpanan File (Foto & Video)
 - MySQL: menyimpan metadata + path file
 - Volume `uploads_data`: menyimpan file fisik
+
+## Alur Request & Log IP Asli (XFF)
+1. User akses web dengan IP publik (contoh: 103.x.x.x)
+2. Nginx (DMZ) terima request, tambah header X-Forwarded-For: 103.x.x.x
+3. Nginx forward request ke Flask via upstream
+4. Flask baca XFF, catat IP asli user di log
+5. Log dikirim ke Wazuh -> SOC bisa deteksi serangan berdasarkan IP asli
+
+### Konfigurasi
+- Nginx: `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for`
+- Flask: `ProxyFix` middleware dari Werkzeug (perlu ditambah tim Web)
