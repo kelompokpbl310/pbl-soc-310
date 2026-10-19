@@ -20,7 +20,7 @@ services:
       - PORT=8080
       - SERVER_NAME=_
     volumes:
-      - ./nginx/upstream.conf:/etc/nginx/conf.d/upstream.conf:ro
+      - ./nginx/upstream.conf:/etc/nginx/templates/conf.d/default.conf.template:ro
     networks:
       - dmz-net
       - int-net
@@ -111,6 +111,8 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    ports:
+      - "3306:3306"
     networks:
       - int-net
     environment:
