@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Beranda | Catering Batam{% endblock %}</title>
+    <meta
+      name="description"
+      content="{% block description %}Catering aqiqah terbaik di Batam: sate, gulai, kebuli, dan kambing guling khas rempah pilihan.{% endblock %}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Julius+Sans+One&family=Salsa&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/5e281edb01.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style/site.css') }}"
+    />
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body class="bg-maroon text-stone-800 antialiased mendung">
+    <header
+      class="sticky top-0 z-50 border-b border-white/10 bg-maroon mendung"
+    >
+      <div
+        class="mx-auto w-full max-w-7xl px-6 sm:px-12 lg:px-20 flex items-center justify-between gap-6 py-4"
+      >
+        <a
+          href="{{ url_for('main.index') }}"
+          class="font-logo flex flex-col text-2xl uppercase leading-[1.15] tracking-[0.02em] text-white"
+          aria-label="Catering Batam - Beranda"
+          ><span>Catering</span><span>Batam</span></a
+        >
+        <nav
+          class="hidden flex-1 items-center justify-center gap-10 text-base font-medium text-white/90 md:flex"
+          aria-label="Menu utama"
+        >
+          <a
+            href="{{ url_for('main.index') }}"
+            class="underline-offset-8 decoration-2 transition hover:text-white hover:underline {% if request.endpoint == 'index' %}text-white underline{% endif %}"
+            >Beranda</a
+          ><a
+            href="{{ url_for('main.produk') }}"
+            class="underline-offset-8 decoration-2 transition hover:text-white hover:underline {% if request.endpoint in ['produk', 'detail_produk'] %}text-white underline{% endif %}"
+            >Produk</a
+          ><a
+            href="{{ url_for('main.tentang') }}"
+            class="underline-offset-8 decoration-2 transition hover:text-white hover:underline {% if request.endpoint == 'tentang' %}text-white underline{% endif %}"
+            >Tentang Kami</a
+          >
+        </nav>
+        <div class="flex items-center gap-3">
+          {% if current_user.is_authenticated %}
+          <a
+            href="{{ url_for('main.checkout') }}"
+            aria-label="Keranjang"
+            class="flex h-10 w-10 items-center justify-center rounded-full text-white transition hover:bg-white/10"
+            ><i class="fa-solid fa-cart-shopping fa-lg"></i
+          ></a>
+          {% endif %}
+          {% if current_user.is_authenticated %}
+          <!-- Profile Dropdown -->
+          <div class="relative" id="profile-dropdown">
+            <button
+              type="button"
+              id="profile-btn"
+              class="flex items-center gap-1.5 rounded-full border-2 border-maroon bg-cream px-2.5 py-1.5 transition hover:bg-white"
+              aria-expanded="false"
+              aria-haspopup="true"
+            >
+              <!-- Avatar with initial -->
+              {% if current_user.avatar %}
+                <img src="{{ url_for('static', filename=current_user.avatar) }}" alt="{{ current_user.fullname }}" class="h-8 w-8 rounded-full border-2 border-maroon object-cover" />
+              {% else %}
+                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-cream border-2 border-maroon text-maroon font-bold text-sm">
+                  {{ current_user.fullname[0].upper() }}
+                </span>
+              {% endif %}
+              <i class="fa-solid fa-chevron-down text-maroon"></i>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div
+              id="profile-menu"
+              class="hidden absolute right-0 mt-2 w-48 rounded-xl border border-maroon/20 bg-cream shadow-lg py-1"
+              role="menu"
+            >
+              <a
+                href="{{ url_for('main.profil') }}"
+                class="flex items-center gap-2 px-4 py-2 text-sm text-maroon hover:bg-white"
+                role="menuitem"
+              >
+                <i class="fa-solid fa-user fa-lg"></i>
+                Akun
+              </a>
+              <a
+                href="{{ url_for('main.profil_keamanan') }}"
+                class="flex items-center gap-2 px-4 py-2 text-sm text-maroon hover:bg-white"
+                role="menuitem"
+              >
+                <i class="fa-solid fa-shield-halved fa-lg"></i>
+                Keamanan
+              </a>
+              <a
+                href="{{ url_for('main.profil_riwayat') }}"
+                class="flex items-center gap-2 px-4 py-2 text-sm text-maroon hover:bg-white"
+                role="menuitem"
+              >
+                <i class="fa-solid fa-clock-rotate-left fa-lg"></i>
+                Riwayat Pesanan
+              </a>
+              {% if current_user.is_authenticated and current_user.role == 'admin' %}
+              <hr class="my-1 border-maroon/20" />
+              <a
+                href="{{ url_for('admin.dashboard') }}"
+                class="flex items-center gap-2 px-4 py-2 text-sm text-maroon hover:bg-white"
+                role="menuitem"
+              >
+                <i class="fa-solid fa-gauge-high fa-lg"></i>
+                Dashboard Admin
+              </a>
+              {% endif %}
+              <hr class="my-1 border-maroon/20" />
+              <form action="{{ url_for('auth.logout') }}" method="POST">
+                <button
+                  type="submit"
+                  class="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-white"
+                  role="menuitem"
+                >
+                  <i class="fa-solid fa-right-from-bracket fa-lg"></i>
+                  Keluar
+                </button>
+              </form>
+            </div>
+          </div>
+          {% else %}
+          <a
+            href="{{ url_for('auth.login') }}"
+            class="inline-flex items-center justify-center gap-2 rounded-full bg-cream px-7 py-3 text-sm font-semibold text-maroon shadow-sm transition hover:bg-white lg:flex !py-2.5"
+            >Sign In</a
+          >
+          {% endif %}
+          <button
+            type="button"
+            data-menu-btn
+            aria-label="Buka menu"
+            class="flex h-10 w-10 items-center justify-center rounded-full text-white hover:bg-white/10 md:hidden"
+          >
+            <i class="fa-solid fa-bars fa-lg"></i>
+          </button>
+        </div>
+      </div>
+      <div
+        data-menu
+        class="hidden border-t border-gold px-6 pb-4 text-white md:hidden flex flex-col items-center"
+      >
+        <a href="{{ url_for('main.index') }}" class="block py-2 text-center"
+          >Beranda</a
+        ><a href="{{ url_for('main.produk') }}" class="block py-2 text-center">Produk</a
+        ><a href="{{ url_for('main.tentang') }}" class="block py-2 text-center"
+          >Tentang Kami</a
+        >
+      </div>
+      <div class="h-0.5 bg-gold" aria-hidden="true"></div>
+    </header>
+    <main>{% block content %}{% endblock %}</main>
+    <div class="h-0.5 bg-gold" aria-hidden="true"></div>
+    <footer
+      class="border-t border-white/10 bg-maroon pb-8 pt-12 text-white mendung"
+    >
+      <div class="mx-auto w-full max-w-7xl px-6 sm:px-12 lg:px-20">
+        <div class="flex flex-row items-center justify-between gap-8 pb-8 border-b border-white/40">
+          <!-- Left: Logo stacked with tagline -->
+          <div class="max-w-md">
+            <h4 class="font-logo text-lg flex flex-col uppercase tracking-[0.02em] leading-[1.15]">
+              <span>Catering</span><span>Batam</span>
+            </h4>
+            <p class="mt-3 text-sm text-white/70 leading-relaxed">Layanan catering aqiqah, kambing guling, dan nasi kotak syukuran nomor satu di Batam. Halal, higienis, dan terpercaya sejak 2015.</p>
+          </div>
+          
+          <!-- Right: Social media 2x2 grid -->
+          <div class="flex justify-end">
+            <div class="grid grid-cols-2 gap-3 w-fit">
+              <a
+                href="#"
+                aria-label="Facebook"
+                class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/15 text-white transition hover:bg-white hover:text-maroon"
+                ><i class="fa-brands fa-facebook-f fa-lg"></i
+              ></a>
+              <a
+                href="#"
+                aria-label="Instagram"
+                class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/15 text-white transition hover:bg-white hover:text-maroon"
+                ><i class="fa-brands fa-instagram fa-lg"></i
+              ></a>
+              <a
+                href="#"
+                aria-label="WhatsApp"
+                class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/15 text-white transition hover:bg-white hover:text-maroon"
+                ><i class="fa-brands fa-whatsapp fa-lg"></i
+              ></a>
+              <a
+                href="#"
+                aria-label="YouTube"
+                class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/15 text-white transition hover:bg-white hover:text-maroon"
+                ><i class="fa-brands fa-youtube fa-lg"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-row md:flex-row md:items-center justify-center gap-4 mt-6">
+          <p class="text-xs text-white/60">© 2026 Catering Batam. Hak cipta dilindungi undang-undang.</p>
+        </div>
+      </div>
+    </footer>
+    <script src="{{ url_for('static', filename='script/site.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+  </body>
+</html>
