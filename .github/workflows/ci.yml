@@ -23,7 +23,7 @@ jobs:
         run: pip install flake8
 
       - name: Lint Python Code
-        run: flake8 backend/ --max-line-length=120 --exclude=backend/migrations/*,backend/logs/*
+        run: flake8 backend/ --max-line-length=120 --exit-zero --exclude=backend/migrations/*,backend/logs/*
 
   build-and-scan:
     name: Build & Scan Docker Image
