@@ -19,8 +19,13 @@ services:
       - BACKEND=http://backend_servers
       - PORT=8080
       - SERVER_NAME=_
+      # Tambahan dari Regynda (ModSec Log)
+      - MODSEC_AUDIT_LOG=/var/log/modsec/modsec_audit.log
+      - MODSEC_AUDIT_LOG_FORMAT=JSON
     volumes:
       - ./nginx/upstream.conf:/etc/nginx/templates/conf.d/default.conf.template:ro
+      - /var/log/soc/nginx:/var/log/nginx
+      - /var/log/soc/modsec:/var/log/modsec
     networks:
       - dmz-net
       - int-net
@@ -32,11 +37,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   web:
     build: ../backend
@@ -58,6 +58,7 @@ services:
       - INSTANCE_NAME=web1
     volumes:
       - uploads_data:/app/uploads
+      - /var/log/soc/app:/app/logs
     deploy:
       resources:
         limits:
@@ -94,6 +95,7 @@ services:
       - INSTANCE_NAME=web2
     volumes:
       - uploads_data:/app/uploads
+      - /var/log/soc/app:/app/logs
     deploy:
       resources:
         limits:
@@ -116,8 +118,6 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    ports:
-      - "127.0.0.1:3306:3306"
     networks:
       - int-net
     environment:
@@ -125,8 +125,11 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    ports:
+      - "127.0.0.1:3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+      - /var/log/soc/mysql:/var/log/mysql
     logging:
       driver: "json-file"
       options:
