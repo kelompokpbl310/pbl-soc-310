@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}Checkout | Catering Batam{% endblock %}
+{% block description %}Selesaikan pesanan catering aqiqah Anda.{% endblock %}
+{% block content %}
+<section class="bg-cream">
+  <div class="mx-auto w-full max-w-7xl px-6 sm:px-12 lg:px-20 flex flex-wrap items-end justify-between gap-4 sm:gap-6 pt-10 lg:pt-12">
+    <div class="min-w-0 flex-1 pb-10 lg:pb-12">
+      <span class="inline-block -rotate-2 border-2 border-maroon px-2 py-0.5 text-[11px] font-bold tracking-[0.14em] text-maroon">
+        Pemesanan
+      </span>
+      <h1 class="mt-1 font-display text-4xl font-black tracking-tight text-maroon-dark lg:text-5xl">
+        Checkout
+      </h1>
+      <nav aria-label="Breadcrumb" class="mt-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-maroon/70">
+        <a href="{{ url_for('main.index') }}" class="hover:text-maroon">Beranda</a>
+        <span aria-hidden="true">›</span>
+        <a href="{{ url_for('main.produk') }}" class="hover:text-maroon">Produk</a>
+        <span aria-hidden="true">›</span>
+        <span class="font-bold text-maroon">Checkout</span>
+      </nav>
+    </div>
+    <img src="{{ url_for('static', filename='img/goat.png') }}" alt="Kambing putih" class="hidden h-auto max-w-[160px] shrink-0 object-contain sm:block sm:h-32 sm:w-auto md:h-40 md:max-w-[208px] lg:h-56 lg:max-w-none">
+  </div>
+</section>
+
+<section class="py-8">
+  <div class="mx-auto w-full max-w-7xl px-6 sm:px-12 lg:px-20">
+    <div class="grid items-start gap-8 lg:grid-cols-12">
+      <!-- Left column: Delivery details form (7 cols) -->
+      <form id="checkout-form" method="POST" class="space-y-4 rounded-3xl bg-cream p-8 shadow-2xl lg:col-span-7">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <h2 class="border-b border-maroon/15 pb-3 text-lg font-bold text-maroon">Detail Pengiriman</h2>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label for="recipient_name" class="mb-1.5 block text-sm font-semibold text-maroon">
+              Nama Penerima <span class="text-maroon">*</span>
+            </label>
+            <input id="recipient_name" name="recipient_name" type="text" placeholder="Nama lengkap penerima" value="{{ form_data.recipient_name if form_data else (user.fullname if user else '') }}" required
+              class="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-800 placeholder:text-stone-400 focus:border-maroon focus:outline-none focus:ring-2 focus:ring-maroon/30 {% if errors and errors.recipient_name %}border-red-500{% endif %}">
+            {% if errors and errors.recipient_name %}
+            <p class="mt-1 text-xs text-red-600">{{ errors.recipient_name }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div>
+          <label for="address" class="mb-1.5 block text-sm font-semibold text-maroon">
+            Alamat Lengkap Pengiriman <span class="text-maroon">*</span>
+          </label>
+          <textarea id="address" name="address" rows="2" placeholder="Nomor rumah, nama jalan, blok, RT/RW, kelurahan, dan kecamatan" required
+            class="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-800 placeholder:text-stone-400 focus:border-maroon focus:outline-none focus:ring-2 focus:ring-maroon/30 {% if errors and errors.address %}border-red-500{% endif %}">{{ form_data.address if form_data else '' }}</textarea>
+          {% if errors and errors.address %}
+          <p class="mt-1 text-xs text-red-600">{{ errors.address }}</p>
+          {% endif %}
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label for="city" class="mb-1.5 block text-sm font-semibold text-maroon">
+              Kota / Kabupaten <span class="text-maroon">*</span>
+            </label>
+            <input id="city" name="city" type="text" placeholder="Kota" value="{{ form_data.city if form_data else 'Kota Batam' }}" required
+              class="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-800 placeholder:text-stone-400 focus:border-maroon focus:outline-none focus:ring-2 focus:ring-maroon/30 {% if errors and errors.city %}border-red-500{% endif %}">
+            {% if errors and errors.city %}
+            <p class="mt-1 text-xs text-red-600">{{ errors.city }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label for="phone" class="mb-1.5 block text-sm font-semibold text-maroon">
+              Nomor WhatsApp / HP <span class="text-maroon">*</span>
+            </label>
+            <input id="phone" name="phone" type="tel" placeholder="08xxxxxxxxxx" value="{{ form_data.phone if form_data else (user.phone if user and user.phone else '') }}" required
+              class="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-800 placeholder:text-stone-400 focus:border-maroon focus:outline-none focus:ring-2 focus:ring-maroon/30 {% if errors and errors.phone %}border-red-500{% endif %}">
+            {% if errors and errors.phone %}
+            <p class="mt-1 text-xs text-red-600">{{ errors.phone }}</p>
+            {% endif %}
+          </div>
+          <div>
+            <label for="email" class="mb-1.5 block text-sm font-semibold text-maroon">
+              Alamat Email <span class="text-maroon">*</span>
+            </label>
+            <input id="email" name="email" type="email" placeholder="nama@email.com" value="{{ user.email if user else '' }}" required readonly
+              class="w-full rounded-xl border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-800 placeholder:text-stone-400">
+            <p class="mt-1 text-xs text-stone-500">Email tidak bisa diubah di sini. Gunakan email akun Anda.</p>
+          </div>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label for="delivery_date" class="mb-1.5 block text-sm font-semibold text-maroon">
+              Tanggal Pengiriman <span class="text-maroon">*</span>
+            </label>
+            <input id="delivery_date" name="delivery_date" type="date" value="{{ form_data.delivery_date if form_data else '' }}" min="{{ (today + timedelta(days=1)).isoformat() }}" required
+              class="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-800 placeholder:text-stone-400 focus:border-maroon focus:outline-none focus:ring-2 focus:ring-maroon/30 {% if errors and errors.delivery_date %}border-red-500{% endif %}">
+            {% if errors and errors.delivery_date %}
+            <p class="mt-1 text-xs text-red-600">{{ errors.delivery_date }}</p>
+            {% endif %}
+            <p class="mt-1 text-xs text-stone-500">Minimal 1 hari lead time (besok atau setelahnya).</p>
+          </div>
+          <div>
+            <label for="delivery_time" class="mb-1.5 block text-sm font-semibold text-maroon">
+              Waktu Pengiriman (Opsional)
+            </label>
+            <input id="delivery_time" name="delivery_time" type="time" value="{{ form_data.delivery_time if form_data else '' }}"
+              class="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-800 placeholder:text-stone-400 focus:border-maroon focus:outline-none focus:ring-2 focus:ring-maroon/30">
+          </div>
+        </div>
+
+        <div>
+          <label for="notes" class="mb-1.5 block text-sm font-semibold text-maroon">
+            Catatan Pesanan Khusus (Opsional)
+          </label>
+          <textarea id="notes" name="notes" rows="3" placeholder="Contoh: jam pengiriman aqiqah, bumbu tidak terlalu pedas, instruksi khusus kurir."
+            class="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-800 placeholder:text-stone-400 focus:border-maroon focus:outline-none focus:ring-2 focus:ring-maroon/30">{{ form_data.notes if form_data else '' }}</textarea>
+        </div>
+      </form>
+
+      <!-- Right column: Order summary + Payment method (5 cols) -->
+      <div class="space-y-6 lg:col-span-5">
+        <div class="rounded-2xl border border-maroon/10 bg-cream p-8 shadow-2xl top-24">
+          <h2 class="border-b border-maroon/15 pb-3 text-lg font-bold text-maroon">Pesanan Anda</h2>
+          <div class="divide-y divide-maroon/10">
+            {% for item in cart_items %}
+            <div class="flex items-center justify-between gap-3 py-3">
+              <div class="flex items-center gap-3">
+                <a href="{{ url_for('main.detail_produk', id=item.product_id) }}" class="block h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-maroon/10 bg-stone-200" aria-label="{{ item.name }}">
+                  {% if item.image %}
+                  <img src="{{ url_for('static', filename=item.image.replace('static/', '')) }}" alt="{{ item.name }}" loading="lazy" class="h-full w-full object-cover">
+                  {% else %}
+                  <div class="flex h-full w-full items-center justify-center text-xs text-stone-500">No image</div>
+                  {% endif %}
+                </a>
+                <div>
+                  <p class="text-sm font-semibold text-maroon">{{ item.name }}</p>
+                  <p class="text-xs text-stone-500">{{ item.quantity }} × Rp {{ "{:,.0f}".format(item.price).replace(",", ".") }}</p>
+                </div>
+              </div>
+              <span class="whitespace-nowrap text-sm font-semibold text-maroon">Rp {{ "{:,.0f}".format(item.subtotal).replace(",", ".") }}</span>
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="mt-2 space-y-2 border-t border-maroon/15 pt-4 text-sm text-maroon/85">
+            <p class="flex justify-between">
+              <span>Subtotal ({{ cart_items|length }} produk)</span>
+              <span class="font-semibold">Rp {{ "{:,.0f}".format(cart_subtotal).replace(",", ".") }}</span>
+            </p>
+            <p class="flex justify-between">
+              <span>Ongkos Kirim (Area Batam)</span>
+              <span class="font-bold uppercase text-emerald-700">Gratis</span>
+            </p>
+            <p class="flex justify-between border-t border-maroon/15 pt-3 text-base font-bold text-maroon">
+              <span>Total Pembayaran</span>
+              <span>Rp {{ "{:,.0f}".format(cart_total).replace(",", ".") }}</span>
+            </p>
+            <button type="submit" form="checkout-form" id="checkout-submit" class="inline-flex items-center justify-center gap-2 rounded-full bg-maroon px-7 py-3 text-sm font-semibold text-white shadow transition hover:bg-maroon-dark mt-5 w-full py-3.5">
+            Konfirmasi Pesanan
+          </button>
+          </div>
+        </div>
+
+       
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

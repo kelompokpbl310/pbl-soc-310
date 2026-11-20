@@ -1,0 +1,20 @@
+<!-- Mobile Navigation (Horizontal Scroll) -->
+<div class="lg:hidden overflow-x-auto pb-2 -mx-6 px-6 mb-6" role="navigation" aria-label="Menu profil">
+  <div class="flex min-w-max gap-2">
+    {% set mobile_nav = [
+      ('akun', 'Akun', 'fa-solid fa-user'),
+      ('keamanan', 'Keamanan', 'fa-solid fa-shield-halved'),
+      ('riwayat', 'Riwayat Pesanan', 'fa-solid fa-clock-rotate-left'),
+    ] %}
+    {% for key, label, icon in mobile_nav %}
+      <a
+        href="{{ url_for('main.profil' if key == 'akun' else 'main.profil_' + key) }}"
+        class="flex shrink-0 items-center gap-1.5 rounded-full border-2 py-2 px-4 text-sm font-semibold transition-all duration-150 whitespace-nowrap
+          {% if key == active_tab %}border-gold bg-cream text-maroon-dark{% else %}border-transparent bg-transparent text-ink/70 hover:border-cream/30 hover:bg-cream hover:text-maroon-dark{% endif %}"
+        aria-current="{% if key == active_tab %}page{% endif %}"
+      >
+        <i class="{{ icon }} fa-lg"></i>{{ label }}
+      </a>
+    {% endfor %}
+  </div>
+</div>
